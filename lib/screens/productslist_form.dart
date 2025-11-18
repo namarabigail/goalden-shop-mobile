@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:goalden_shop/widgets/left_drawer.dart';
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:goalden_shop/screens/menu.dart';
 
 class ProductsFormPage extends StatefulWidget {
     const ProductsFormPage({super.key});
@@ -31,6 +35,7 @@ class _ProductsFormPageState extends State<ProductsFormPage> {
 
   @override
   Widget build(BuildContext context) {
+      final request = context.watch<CookieRequest>();
       return Scaffold(
         appBar: AppBar(
           title: const Center(
@@ -343,50 +348,51 @@ class _ProductsFormPageState extends State<ProductsFormPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
-                      style: ButtonStyle(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          // ... (Logika POST ke Django)
+                          
+                          final response = await request.postJson(
+                            "http://localhost:8000/create-flutter/",
+                            jsonEncode({
+                              "Name": _name,
+                              "Harga": _price,
+                              "Deskripsi": _description,
+                              "Thumbnail": _thumbnail,
+                              "Kategori": _category,
+                              "Is Featured": _isFeatured,
+                              "Stok": _stock,
+                              "Rating": _rating,
+                              "Ukuran":_size,
+                              "Brand": _brand,
+                            }),
+                          );
+                          
+                            if (context.mounted) {
+                            if (response['status'] == 'success') {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text("Products successfully saved!"),
+                              ));
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MyHomePage()),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text("Something went wrong, please try again."),
+                              ));
+                            }
+                          }
+                        }
+                      },
+                      style: ButtonStyle( // <-- Pindahkan style ke tengah
                         backgroundColor:
                             MaterialStateProperty.all(Colors.indigo),
                       ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text('Produk berhasil disimpan!'),
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Nama: $_name'),
-                                      Text('Harga: $_price'),
-                                      Text('Deskripsi: $_description'),
-                                      Text('Thumbnail: ${_thumbnail.isEmpty ? "Tidak Ada" : _thumbnail}'),
-                                      Text('Kategori: $_category'),
-                                      Text('Is Featured: ${_isFeatured ? "Ya" : "Tidak"}'),
-                                      Text('Stok: $_stock'),
-                                      Text('Rating: $_rating'),
-                                      Text('Ukuran: ${_size.isEmpty ? "N/A" : _size}'),
-                                      Text('Brand: ${_brand.isEmpty ? "N/A" : _brand}'),
-                                    ],
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    child: const Text('OK'),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      _formKey.currentState!.reset();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        }
-                      },
-                      child: const Text(
+                      child: const Text( // <-- Pindahkan child ke posisi terakhir
                         "Save",
                         style: TextStyle(color: Colors.white),
                       ),
