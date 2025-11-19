@@ -31,10 +31,8 @@ class _ProductEntryListPageState extends State<ProductEntryListPage> {
     const String baseUrl = 'http://localhost:8000/'; 
     
     if (_currentFilter == 'user') {
-      // Endpoint yang difilter oleh user (Produk Saya)
       url = '${baseUrl}json-user/'; 
     } else {
-      // Endpoint default (Semua Produk)
       url = '${baseUrl}json/'; 
     }
 
@@ -42,7 +40,6 @@ class _ProductEntryListPageState extends State<ProductEntryListPage> {
     // Decode response to json format
     var data = response;
     
-    // Convert json data to NewsEntry objects
     List<ProductEntry> listProducts = [];
     for (var d in data) {
       if (d != null) {
@@ -113,7 +110,7 @@ class _ProductEntryListPageState extends State<ProductEntryListPage> {
                 itemBuilder: (_, index) => ProductEntryCard(
                   product: snapshot.data![index],
                   onTap: () {
-                    // Navigate to news detail page
+                    // Navigate to product detail page
                     Navigator.push(
                       context,
                       MaterialPageRoute(

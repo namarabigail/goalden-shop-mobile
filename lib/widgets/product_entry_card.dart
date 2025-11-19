@@ -61,7 +61,7 @@ class ProductEntryCard extends StatelessWidget {
                   'Harga: IDR ${product.price}',
                   style: const TextStyle(
                     fontSize: 16.0,
-                    color: Colors.green,
+                    color: Color.fromARGB(255, 0, 0, 0),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
